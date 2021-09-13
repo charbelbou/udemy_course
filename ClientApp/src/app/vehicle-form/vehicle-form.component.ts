@@ -1,6 +1,11 @@
 import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import { ToastyService } from "ng2-toasty";
+import { Observable } from "rxjs";
 import { VehicleService } from "../services/vehicle.service";
+import "rxjs/add/observable/forkJoin";
+import { SaveVehicle, Vehicle } from "../models/vehicle";
+import * as _ from "underscore";
 
 @Component({
   selector: "app-vehicle-form",
@@ -11,66 +16,136 @@ export class VehicleFormComponent implements OnInit {
   // Initializing variables for the makes, models, features, and the selected vehicle.
   makes: any[];
   models: any[];
-  vehicle: any = {
+  vehicle: SaveVehicle = {
+    id: 0,
+    makeId: 0,
+    modelId: 0,
+    isRegistered: false,
     features: [],
-    contact: {},
+    contact: {
+      name: "",
+      email: "",
+      phone: "",
+    },
   };
   features: any[];
-  // Inject VehicleService
+  // Inject ActivatedRoute, Router, VehicleService, and ToastyService
   constructor(
+    private route: ActivatedRoute,
+    private router: Router,
     private VehicleService: VehicleService,
     private ToastySerivce: ToastyService
-  ) {}
+  ) {
+    // route used to subscribe to url parameters
+    // assign the "id" parameter to vehicle.id
+    route.params.subscribe((p) => {
+      this.vehicle.id = +p["id"];
+    });
+  }
 
   // Is triggered when component is rendered
   ngOnInit(): void {
-    // Using VehicleService's 'getMakes' function and subscribing to it,
-    // Assign returned list of data to makes.
-    this.VehicleService.getMakes().subscribe((makes: any[]) => {
-      this.makes = makes;
-    });
-    // Using VehicleService's 'getFeatures' function and subscribing to it,
-    // Assign returned list of data to features.
-    this.VehicleService.getFeatures().subscribe((features: any[]) => {
-      this.features = features;
-    });
+    // Collection of sources (to get makes and features)
+    var sources = [
+      this.VehicleService.getMakes(),
+      this.VehicleService.getFeatures(),
+    ];
+
+    // Pushes 'getVehicle' as a source, only if id is given in url. (Update form)
+    if (this.vehicle.id) {
+      sources.push(this.VehicleService.getVehicle(this.vehicle.id));
+    }
+
+    // ForkJoin all the sources and subscribe
+    // Assign data[0] to makes, assign data[1] to features
+    // If id isn't 0 (passed from url), set vehicle and popluateModels.
+    Observable.forkJoin(sources).subscribe(
+      ([makes, features, vehicle]: any[]) => {
+        this.makes = makes;
+        this.features = features;
+        if (this.vehicle.id) {
+          this.setVehicle(vehicle);
+          this.populateModels();
+        }
+      },
+      // If invalid ID, send back to home
+      (err) => {
+        if (err.status == 404) {
+          this.router.navigate(["/"]);
+        }
+      }
+    );
+  }
+
+  // Populates the 'vehicle' object with the object passed as a parameter
+  // Used to populate form if updating vehicle object.
+  private setVehicle(v: Vehicle) {
+    this.vehicle.id = v.id;
+    this.vehicle.makeId = v.make.id;
+    this.vehicle.modelId = v.model.id;
+    this.vehicle.isRegistered = v.isRegistered;
+    this.vehicle.contact = v.contact;
+    // Pluck features IDs, rather than the object themselves
+    this.vehicle.features = _.pluck(v.features, "id");
   }
 
   // Executed when 'Make' selection changes
+  // If make is changed, we need to populate the models again
   onMakeChange() {
-    // Finds the selected make
-    var selectedMake = this.makes.find((m) => m.id == this.vehicle.makeId);
-    console.log(selectedMake);
-    // If selectedMake exists, assigns the list of models to models,
-    // otherwise, assigns empty list.
-    this.models = selectedMake ? selectedMake.models : [];
+    this.populateModels();
     delete this.vehicle.modelId;
   }
 
+  private populateModels() {
+    // Finds the selected make
+    var selectedMake = this.makes.find((m) => m.id == this.vehicle.makeId);
+    // If selectedMake exists, assigns the list of models to models,
+    // otherwise, assigns empty list.
+    this.models = selectedMake ? selectedMake.models : [];
+  }
+
+  // Triggered when feature is selected/deselected
   onFeatureToggle(featureId, $event) {
+    // If feature was selected, push it's id to list of features
     if ($event.target.checked) {
       this.vehicle.features.push(featureId);
-    } else {
+    }
+    // If feature was deselected, remove it's id.
+    else {
       var index = this.vehicle.features.indexOf(featureId);
       this.vehicle.features.splice(index, 1);
     }
   }
 
+  // Triggered when form is submitted
   submit() {
-    this.vehicle.isRegistered = this.vehicle.isRegistered == "true";
-    this.VehicleService.create(this.vehicle).subscribe(
-      (x) => console.log(x),
-      (err) => {
-        console.log(err);
-        console.log("Weq");
-        this.ToastySerivce.error({
-          title: "Error",
-          msg: "An unexpected error happened.",
+    // If form is used to update a vehicle (if id isnt 0), call VehicleService.update on the vehicle object
+    // and subscribe
+    // If successful, trigger a toastyservice notification
+
+    if (this.vehicle.id) {
+      this.VehicleService.update(this.vehicle).subscribe((x) => {
+        this.ToastySerivce.success({
+          title: "Success",
+          msg: "The vehicle was sucessfully updated",
           theme: "bootstrap",
           showClose: true,
           timeout: 5000,
         });
-      }
-    );
+      });
+    }
+    // Else, create the vehicle and subscribe
+    else {
+      this.VehicleService.create(this.vehicle).subscribe((x) => console.log(x));
+    }
+  }
+
+  // Delete vehicle and navigate back to home.
+  delete() {
+    if (confirm("Are you sure?")) {
+      this.VehicleService.delete(this.vehicle.id).subscribe((x) => {
+        this.router.navigate(["/"]);
+      });
+    }
   }
 }

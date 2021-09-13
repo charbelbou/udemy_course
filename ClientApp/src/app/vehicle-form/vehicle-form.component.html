@@ -21,7 +21,7 @@
       <!-- First option is empty, then has m options depending on 'makes' -->
       <!-- Each option's value is m.id -->
       <option value=""></option>
-      <option *ngFor="let m of makes" value=" {{ m.id }} ">{{ m.name }}</option>
+      <option *ngFor="let m of makes" value="{{ m.id }}">{{ m.name }}</option>
     </select>
     <div *ngIf="make.touched && !make.valid" class="alert alert-danger">
       Please specify the make.
@@ -57,7 +57,7 @@
       type="radio"
       name="isRegistered"
       id="registered"
-      value="true"
+      [value]="true"
       [(ngModel)]="vehicle.isRegistered"
     />Yes
   </label>
@@ -66,7 +66,7 @@
       type="radio"
       name="isRegistered"
       id="notRegistered"
-      value="false"
+      [value]="false"
       [(ngModel)]="vehicle.isRegistered"
     />No
   </label>
@@ -78,6 +78,7 @@
         type="checkbox"
         id="feature{{ f.id }}"
         (change)="onFeatureToggle(f.id, $event)"
+        [checked]="vehicle.features.includes(f.id)"
       />{{ f.name }}</label
     >
   </div>
@@ -143,4 +144,7 @@
   </div>
 
   <button class="btn btn-primary">Save</button>
+  <button class="btn btn-danger" type="button" (click)="delete()">
+    Delete
+  </button>
 </form>

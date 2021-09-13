@@ -31,7 +31,6 @@ namespace udemy.Controllers
         {
             // Checks if the model from the Body is consistent with VehicleResource
             // If the Model state isn't valid, return BadRequest
-            throw new Exception();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

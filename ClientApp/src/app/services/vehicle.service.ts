@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SaveVehicle } from "../models/vehicle";
 
 @Injectable({
   providedIn: "root",
@@ -20,7 +21,23 @@ export class VehicleService {
     return this.http.get("api/features");
   }
 
+  // Creating Vehicle
   create(vehicle) {
     return this.http.post("/api/vehicles", vehicle);
+  }
+
+  // Getting vehicle through id
+  getVehicle(id) {
+    return this.http.get("/api/vehicles/" + id);
+  }
+
+  // Updating vehicle using object and id
+  update(vehicle: SaveVehicle) {
+    return this.http.put("api/vehicles/" + vehicle.id, vehicle);
+  }
+
+  // Deleting vehicle using id.
+  delete(id) {
+    return this.http.delete("/api/vehicles" + id);
   }
 }
