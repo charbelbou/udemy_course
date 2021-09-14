@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,8 @@ using udemy.Models;
 using udemy.Persistence;
 using udemy_course.Controllers.Resources;
 using udemy_course.Persistence;
+using udemy_course1.Controllers.Resources;
+using udemy_course1.Core.Models;
 
 namespace udemy.Controllers
 {
@@ -122,6 +125,16 @@ namespace udemy.Controllers
             var vehicleResource = mapper.Map<Vehicle, VehicleResource>(vehicle);
 
             return Ok(vehicleResource);
+        }
+        // Get vehicles, has VehicleQueryResource parameter
+        [HttpGet]
+        public async Task<QueryResultResource<VehicleResource>> GetVehicles(VehicleQueryResource filterResource){
+            // Maps from VehicleQueryResource to VehicleQuery
+            var filter = mapper.Map<VehicleQueryResource,VehicleQuery>(filterResource);
+            // Gets vehicles with filter, returns QueryResult<Vehicle>
+            var queryResult = await repository.GetVehicles(filter);
+            // Maps result back to QueryResultResource with VehicleResource
+            return mapper.Map<QueryResult<Vehicle>,QueryResultResource<VehicleResource>>(queryResult);
         }
     }
 }

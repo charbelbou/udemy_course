@@ -14,6 +14,9 @@ import { FetchDataComponent } from "./fetch-data/fetch-data.component";
 import { VehicleFormComponent } from "./vehicle-form/vehicle-form.component";
 import { VehicleService } from "./services/vehicle.service";
 import { AppErrorHandler } from "./app.error-handler";
+import { VehicleListComponent } from "./vehicle-list/vehicle-list.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { PaginationComponent } from "./shared/pagination.component";
 
 // Sentry.io configuration
 Raven.config(
@@ -28,11 +31,14 @@ Raven.config(
     CounterComponent,
     FetchDataComponent,
     VehicleFormComponent,
+    VehicleListComponent,
+    PaginationComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
     HttpClientModule,
     FormsModule,
+    FontAwesomeModule,
     ToastyModule.forRoot(),
     RouterModule.forRoot([
       { path: "", component: HomeComponent, pathMatch: "full" },
@@ -41,6 +47,8 @@ Raven.config(
       // Depending on whether the page is for a new vehicle, or to update an existing one.
       { path: "vehicles/new", component: VehicleFormComponent },
       { path: "vehicles/:id", component: VehicleFormComponent },
+      // New Route for viewing vehicles
+      { path: "vehicles", component: VehicleListComponent },
       { path: "counter", component: CounterComponent },
       { path: "fetch-data", component: FetchDataComponent },
     ]),

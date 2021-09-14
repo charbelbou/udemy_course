@@ -3,6 +3,8 @@ using udemy.Models;
 using udemy.Controllers.Resources;
 using System.Linq;
 using udemy_course.Controllers.Resources;
+using udemy_course1.Controllers.Resources;
+using udemy_course1.Core.Models;
 
 namespace udemy.Mapping
 {
@@ -11,6 +13,7 @@ namespace udemy.Mapping
         public MappingProfile(){
             // Domain to API resource
 
+            CreateMap(typeof(QueryResult<>),typeof(QueryResultResource<>));
             // Mapping Make to MakeResource
             CreateMap<Make,MakeResource>();
             
@@ -49,6 +52,9 @@ namespace udemy.Mapping
 
 
             // API Resource to Domain
+
+            // Mapping VehicleQueryResource to VehicleQuery
+            CreateMap<VehicleQueryResource,VehicleQuery>();
             // Mapping VehicleResource to Vehicle
             CreateMap<SaveVehicleResource,Vehicle>()
             // The property 'Vehicle.Id' is part of a key and so cannot be modified

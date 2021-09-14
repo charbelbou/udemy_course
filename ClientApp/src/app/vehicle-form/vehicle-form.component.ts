@@ -136,6 +136,7 @@ export class VehicleFormComponent implements OnInit {
     }
     // Else, create the vehicle and subscribe
     else {
+      delete this.vehicle.id;
       this.VehicleService.create(this.vehicle).subscribe((x) => console.log(x));
     }
   }
