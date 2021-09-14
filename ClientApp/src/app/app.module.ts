@@ -15,8 +15,8 @@ import { VehicleFormComponent } from "./vehicle-form/vehicle-form.component";
 import { VehicleService } from "./services/vehicle.service";
 import { AppErrorHandler } from "./app.error-handler";
 import { VehicleListComponent } from "./vehicle-list/vehicle-list.component";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { PaginationComponent } from "./shared/pagination.component";
+import { PaginationComponent } from "./pagination/pagination.component";
+import { AngularFontAwesomeModule } from "angular-font-awesome";
 
 // Sentry.io configuration
 Raven.config(
@@ -38,7 +38,7 @@ Raven.config(
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
     HttpClientModule,
     FormsModule,
-    FontAwesomeModule,
+    AngularFontAwesomeModule,
     ToastyModule.forRoot(),
     RouterModule.forRoot([
       { path: "", component: HomeComponent, pathMatch: "full" },

@@ -39,7 +39,7 @@
               *ngIf="query.sortBy === c.key"
               class="fa"
               [class.fa-sort-asc]="query.isSortAscending"
-              [class.fa-sort-desc]="query.isSortAscending"
+              [class.fa-sort-desc]="!query.isSortAscending"
             ></i>
           </div>
           <div *ngIf="!c.isSortable">
@@ -59,9 +59,9 @@
   </table>
 </div>
 
-<pagination
+<app-pagination
   [total-items]="queryResult.totalItems"
   [page-size]="query.pageSize"
   (page-changed)="onPageChange($event)"
 >
-</pagination>
+</app-pagination>
