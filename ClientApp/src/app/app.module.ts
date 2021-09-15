@@ -1,10 +1,11 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { ErrorHandler, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
 import { ToastyModule } from "ng2-toasty";
 import * as Raven from "raven-js";
+import "bootstrap";
 
 import { AppComponent } from "./app.component";
 import { NavMenuComponent } from "./nav-menu/nav-menu.component";
@@ -17,6 +18,12 @@ import { AppErrorHandler } from "./app.error-handler";
 import { VehicleListComponent } from "./vehicle-list/vehicle-list.component";
 import { PaginationComponent } from "./pagination/pagination.component";
 import { AngularFontAwesomeModule } from "angular-font-awesome";
+import { ViewVehicleComponent } from "./view-vehicle/view-vehicle.component";
+import { PhotoService } from "./services/photo.service";
+import {
+  BrowserXhrWithProgress,
+  ProgressService,
+} from "./services/progress.service";
 
 // Sentry.io configuration
 Raven.config(
@@ -33,6 +40,7 @@ Raven.config(
     VehicleFormComponent,
     VehicleListComponent,
     PaginationComponent,
+    ViewVehicleComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
@@ -46,8 +54,10 @@ Raven.config(
       // Two different routes for vehicle page
       // Depending on whether the page is for a new vehicle, or to update an existing one.
       { path: "vehicles/new", component: VehicleFormComponent },
-      { path: "vehicles/:id", component: VehicleFormComponent },
-      // New Route for viewing vehicles
+      // Route to display vehicle information
+      { path: "vehicles/:id", component: ViewVehicleComponent },
+      // Route to edit vehicle information
+      { path: "vehicles/edit/:id", component: VehicleFormComponent },
       { path: "vehicles", component: VehicleListComponent },
       { path: "counter", component: CounterComponent },
       { path: "fetch-data", component: FetchDataComponent },
@@ -56,7 +66,16 @@ Raven.config(
   providers: [
     // Configures the app to use AppErrorHandler instead of ErrorHandler class.
     { provide: ErrorHandler, useClass: AppErrorHandler },
+
+    // Override the http interceptors with custom class
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: BrowserXhrWithProgress,
+      multi: true,
+    },
     VehicleService,
+    PhotoService,
+    ProgressService,
   ],
   bootstrap: [AppComponent],
 })

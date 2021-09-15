@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using udemy_course1.Core.Models;
 
 namespace udemy.Models
 {
@@ -41,11 +42,15 @@ namespace udemy.Models
 
         // Collection of features
         public ICollection<VehicleFeature> Features { get; set; }
+
+        // Collection of photos
+        public ICollection<Photo> Photos { get; set; }
         
         // Constructor instantializing the Features collection
         public Vehicle()
         {
             Features = new Collection<VehicleFeature>();
+            Photos = new Collection<Photo>();
         }
     }
 }

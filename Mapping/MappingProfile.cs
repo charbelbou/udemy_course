@@ -12,7 +12,10 @@ namespace udemy.Mapping
     {
         public MappingProfile(){
             // Domain to API resource
-
+            
+            // Mapping Photo to PhotoResource
+            CreateMap<Photo,PhotoResource>();
+            
             CreateMap(typeof(QueryResult<>),typeof(QueryResultResource<>));
             // Mapping Make to MakeResource
             CreateMap<Make,MakeResource>();

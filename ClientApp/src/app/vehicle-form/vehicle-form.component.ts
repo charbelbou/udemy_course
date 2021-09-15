@@ -39,7 +39,7 @@ export class VehicleFormComponent implements OnInit {
     // route used to subscribe to url parameters
     // assign the "id" parameter to vehicle.id
     route.params.subscribe((p) => {
-      this.vehicle.id = +p["id"];
+      this.vehicle.id = +p["id"] || 0;
     });
   }
 
@@ -121,24 +121,23 @@ export class VehicleFormComponent implements OnInit {
   submit() {
     // If form is used to update a vehicle (if id isnt 0), call VehicleService.update on the vehicle object
     // and subscribe
+    // If Id isn't 0, update pre existing vehicle
     // If successful, trigger a toastyservice notification
 
-    if (this.vehicle.id) {
-      this.VehicleService.update(this.vehicle).subscribe((x) => {
-        this.ToastySerivce.success({
-          title: "Success",
-          msg: "The vehicle was sucessfully updated",
-          theme: "bootstrap",
-          showClose: true,
-          timeout: 5000,
-        });
+    var result$ = this.vehicle.id
+      ? this.VehicleService.update(this.vehicle)
+      : this.VehicleService.create(this.vehicle);
+    result$.subscribe((vehicle: Vehicle) => {
+      this.ToastySerivce.success({
+        title: "Success",
+        msg: "The vehicle was sucessfully updated",
+        theme: "bootstrap",
+        showClose: true,
+        timeout: 5000,
       });
-    }
-    // Else, create the vehicle and subscribe
-    else {
-      delete this.vehicle.id;
-      this.VehicleService.create(this.vehicle).subscribe((x) => console.log(x));
-    }
+      // Navigate to vehicle page
+      this.router.navigate(["/vehicles/", vehicle.id]);
+    });
   }
 
   // Delete vehicle and navigate back to home.

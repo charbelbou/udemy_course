@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using udemy.Models;
+using udemy_course1.Core.Models;
 
 namespace udemy.Persistence
 {
@@ -14,6 +15,8 @@ namespace udemy.Persistence
         public DbSet<Model> Models { get; set; }
         // Vehicles Db set
         public DbSet<Vehicle> Vehicles { get; set; }
+        // Photo Db Set
+        public DbSet<Photo> Photos { get; set; }
     
         public UdemyDbContext(DbContextOptions<UdemyDbContext> options) : base(options){
 

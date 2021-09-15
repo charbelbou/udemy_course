@@ -7,6 +7,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using udemy_course.Persistence;
 using udemy.Persistence;
+using udemy_course1.Core.Models;
+using udemy_course1.Core;
+using udemy_course1.Persistence;
 
 namespace udemy_course1
 {
@@ -22,9 +25,14 @@ namespace udemy_course1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Adding auto mapper through dependency injection
+            //Configure the photo settings
+            services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));
+            // Mapping interfaces to implementations
+            services.AddScoped<IPhotoRepository,PhotoRepository>();
             services.AddScoped<IUnitOfWork,UnitOfWork>();
             services.AddScoped<IVehicleRepository,VehicleRepository>();
+
+            // Adding auto mapper through dependency injection
             services.AddAutoMapper(typeof(Startup));
             // Add the DbContext we've made as a service through dependency injection (DI)
             services.AddDbContext<UdemyDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
