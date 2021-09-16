@@ -10,6 +10,7 @@ using udemy.Persistence;
 using udemy_course1.Core.Models;
 using udemy_course1.Core;
 using udemy_course1.Persistence;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace udemy_course1
 {
@@ -25,6 +26,15 @@ namespace udemy_course1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = "https://dev-r8lrb84i.us.auth0.com/";
+                options.Audience = "https://api.udemycourse.com";
+            });
             //Configure the photo settings
             services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));
             // Mapping interfaces to implementations
@@ -66,6 +76,10 @@ namespace udemy_course1
             }
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {

@@ -20,6 +20,8 @@ import { PaginationComponent } from "./pagination/pagination.component";
 import { AngularFontAwesomeModule } from "angular-font-awesome";
 import { ViewVehicleComponent } from "./view-vehicle/view-vehicle.component";
 import { PhotoService } from "./services/photo.service";
+import { AuthModule } from "@auth0/auth0-angular";
+
 import {
   BrowserXhrWithProgress,
   ProgressService,
@@ -48,6 +50,10 @@ Raven.config(
     FormsModule,
     AngularFontAwesomeModule,
     ToastyModule.forRoot(),
+    AuthModule.forRoot({
+      domain: "dev-r8lrb84i.us.auth0.com",
+      clientId: "O1ro1EP2yBHaMT6WRUobovqQdadknSuq",
+    }),
     RouterModule.forRoot([
       { path: "", component: HomeComponent, pathMatch: "full" },
       // Added this route for VehicleFormComponent

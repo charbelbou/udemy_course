@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using udemy.Controllers.Resources;
@@ -30,6 +31,7 @@ namespace udemy.Controllers
         }
         // HttpPost attribute
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateVehicleAsync([FromBody] SaveVehicleResource VehicleResource)
         {
             // Checks if the model from the Body is consistent with VehicleResource
@@ -55,6 +57,7 @@ namespace udemy.Controllers
         }
         // HttpPut attribute with id passed as parameter
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateVehicle(int id, [FromBody] SaveVehicleResource VehicleResource)
         {
             // Checks if the model from the Body is consistent with VehicleResource
@@ -90,6 +93,7 @@ namespace udemy.Controllers
         }
         // HttpDelete attribute with id passed as parameter
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteVehicle(int id)
         {
             // Retrieve vehicle through it's id
