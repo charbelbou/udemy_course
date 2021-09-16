@@ -21,13 +21,13 @@ namespace udemy_course1.Controllers
     // Photos API
     public class PhotosController : Controller
     {
-        private readonly IHostingEnvironment host;
+        private readonly IWebHostEnvironment host;
         private readonly IVehicleRepository repository;
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly PhotoSettings photoSettings;
         private readonly IPhotoRepository photoRepository;
-        public PhotosController(IHostingEnvironment host, IVehicleRepository repository, IUnitOfWork unitOfWork, IMapper mapper, IOptionsSnapshot<PhotoSettings> options, IPhotoRepository photoRepository)
+        public PhotosController(IWebHostEnvironment host, IVehicleRepository repository, IUnitOfWork unitOfWork, IMapper mapper, IOptionsSnapshot<PhotoSettings> options, IPhotoRepository photoRepository)
         {
             this.photoRepository = photoRepository;
             this.photoSettings = options.Value;
