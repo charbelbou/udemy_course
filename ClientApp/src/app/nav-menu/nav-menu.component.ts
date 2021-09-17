@@ -1,5 +1,7 @@
 import { Component } from "@angular/core";
+import { JwtHelperService } from "@auth0/angular-jwt";
 import { AuthService } from "@auth0/auth0-angular";
+import { MyAuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-nav-menu",
@@ -9,12 +11,11 @@ import { AuthService } from "@auth0/auth0-angular";
 export class NavMenuComponent {
   isExpanded = false;
 
-  constructor(private auth: AuthService) {}
+  constructor(public auth: MyAuthService) {}
 
   collapse() {
     this.isExpanded = false;
   }
-
   toggle() {
     this.isExpanded = !this.isExpanded;
   }

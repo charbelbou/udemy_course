@@ -1,7 +1,8 @@
-import { ErrorHandler, Inject, NgZone, isDevMode } from "@angular/core";
+import { ErrorHandler, Inject, NgZone, isDevMode, Injectable } from "@angular/core";
 import { ToastyService } from "ng2-toasty";
 import * as Raven from "raven-js";
 
+@Injectable()
 export class AppErrorHandler implements ErrorHandler {
   // This class is instantiated before we import ToastyModule,
   // So we need to inject it manually

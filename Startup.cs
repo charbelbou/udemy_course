@@ -33,7 +33,7 @@ namespace udemy_course1
             }).AddJwtBearer(options =>
             {
                 options.Authority = "https://dev-r8lrb84i.us.auth0.com/";
-                options.Audience = "https://api.udemycourse.com";
+                options.Audience = "https://api.course.com";
             });
             //Configure the photo settings
             services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));

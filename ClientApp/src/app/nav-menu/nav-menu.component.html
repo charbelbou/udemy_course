@@ -29,14 +29,14 @@
           <li class="nav-item" [routerLinkActive]="['link-active']">
             <a
               class="nav-link text-dark"
-              (click)="auth.loginWithPopup()"
-              *ngIf="!auth.isAuthenticated$"
+              (click)="this.auth.loginWithRedirect()"
+              *ngIf="!this.auth.Authenticated"
               >Login</a
             >
             <a
               class="nav-link text-dark"
-              (click)="auth.logout()"
-              *ngIf="auth.isAuthenticated$"
+              (click)="this.auth.logout()"
+              *ngIf="this.auth.Authenticated"
               >Logout</a
             >
           </li>
@@ -58,15 +58,12 @@
               >New Vehicle</a
             >
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']"
-              >Counter</a
-            >
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
-            >
+          <li
+            class="nav-item"
+            [routerLinkActive]="['link-active']"
+            *ngIf="this.auth.isInRole('Admin')"
+          >
+            <a class="nav-link text-dark" [routerLink]="['/admin']">Admin</a>
           </li>
         </ul>
       </div>

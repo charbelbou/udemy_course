@@ -17,15 +17,17 @@ import { VehicleService } from "./services/vehicle.service";
 import { AppErrorHandler } from "./app.error-handler";
 import { VehicleListComponent } from "./vehicle-list/vehicle-list.component";
 import { PaginationComponent } from "./pagination/pagination.component";
-import { AngularFontAwesomeModule } from "angular-font-awesome";
 import { ViewVehicleComponent } from "./view-vehicle/view-vehicle.component";
 import { PhotoService } from "./services/photo.service";
-import { AuthModule } from "@auth0/auth0-angular";
+import { AuthGuard, AuthModule, AuthService } from "@auth0/auth0-angular";
 
 import {
   BrowserXhrWithProgress,
   ProgressService,
 } from "./services/progress.service";
+import { AdminComponent } from "./admin/admin.component";
+import { MyAuthService } from "./services/auth.service";
+import { MyAuthGuard } from "./services/auth-guard.service";
 
 // Sentry.io configuration
 Raven.config(
@@ -43,12 +45,12 @@ Raven.config(
     VehicleListComponent,
     PaginationComponent,
     ViewVehicleComponent,
+    AdminComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
     HttpClientModule,
     FormsModule,
-    AngularFontAwesomeModule,
     ToastyModule.forRoot(),
     AuthModule.forRoot({
       domain: "dev-r8lrb84i.us.auth0.com",
@@ -65,6 +67,9 @@ Raven.config(
       // Route to edit vehicle information
       { path: "vehicles/edit/:id", component: VehicleFormComponent },
       { path: "vehicles", component: VehicleListComponent },
+      // Checks if user is logged in before redirecting to admin page
+      // If not logged in, redirect to login page
+      { path: "admin", component: AdminComponent, canActivate: [MyAuthGuard] },
       { path: "counter", component: CounterComponent },
       { path: "fetch-data", component: FetchDataComponent },
     ]),
@@ -82,6 +87,8 @@ Raven.config(
     VehicleService,
     PhotoService,
     ProgressService,
+    MyAuthGuard,
+    MyAuthService,
   ],
   bootstrap: [AppComponent],
 })
