@@ -40,9 +40,16 @@
         <a
           class="btn btn-primary"
           [routerLink]="['/vehicles/edit/', vehicle.id]"
+          *ngIf="auth.authenticated()"
           >Edit</a
         >
-        <button class="btn btn-danger" (click)="delete()">Delete</button>
+        <button
+          class="btn btn-danger"
+          *ngIf="auth.authenticated()"
+          (click)="delete()"
+        >
+          Delete
+        </button>
         <a class="btn btn-default" [routerLink]="['/vehicles']"
           >View All Vehicles</a
         >
@@ -51,7 +58,12 @@
     <!-- Photos tab -->
     <div role="tabpanel" class="tab-pane" id="photos">
       <h2>Photos</h2>
-      <input type="file" (change)="uploadPhoto()" #fileInput />
+      <input
+        *ngIf="auth.authenticated()"
+        type="file"
+        (change)="uploadPhoto()"
+        #fileInput
+      />
       <div class="progress" *ngIf="progress">
         <div class="progress-bar" [style.width]="progress.percentage + '%'">
           <span class="sr-only">{{ progress.percentage }}% Complete</span>

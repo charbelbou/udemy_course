@@ -9,7 +9,7 @@ export class MyAuthService {
   Authenticated: boolean;
   AccessToken: any;
 
-  constructor(public auth: AuthService) {
+  constructor(public auth: AuthService, private jwtHelper: JwtHelperService) {
     this.Profile = JSON.parse(localStorage.getItem("profile"));
     this.readRolesFromLocalStorage();
 
@@ -20,7 +20,6 @@ export class MyAuthService {
 
     // Get token
     this.auth.idTokenClaims$.subscribe((token) => {
-      console.log(token);
       // If token exists, set item in local storage, then read from it
       if (token) {
         localStorage.setItem("token", token.__raw);
@@ -52,7 +51,17 @@ export class MyAuthService {
     if (storedToken) {
       var JwtHelper = new JwtHelperService();
       var decodedToken = JwtHelper.decodeToken(storedToken);
-      this.roles = decodedToken["https://vega.com/roles"];
+      this.roles = decodedToken["https://vega.com/roles"] || [];
+    }
+  }
+
+  // Check if token is available, and is valid
+  authenticated() {
+    var storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      return !this.jwtHelper.isTokenExpired(storedToken);
+    } else {
+      return false;
     }
   }
 

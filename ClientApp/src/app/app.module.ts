@@ -1,7 +1,7 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { ErrorHandler, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { HttpClientModule } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
 import { ToastyModule } from "ng2-toasty";
 import * as Raven from "raven-js";
@@ -19,15 +19,14 @@ import { VehicleListComponent } from "./vehicle-list/vehicle-list.component";
 import { PaginationComponent } from "./pagination/pagination.component";
 import { ViewVehicleComponent } from "./view-vehicle/view-vehicle.component";
 import { PhotoService } from "./services/photo.service";
-import { AuthGuard, AuthModule, AuthService } from "@auth0/auth0-angular";
+import { AuthModule } from "@auth0/auth0-angular";
+import { ChartModule } from "angular2-chartjs";
 
-import {
-  BrowserXhrWithProgress,
-  ProgressService,
-} from "./services/progress.service";
 import { AdminComponent } from "./admin/admin.component";
 import { MyAuthService } from "./services/auth.service";
 import { MyAuthGuard } from "./services/auth-guard.service";
+import { AdminAuthGuard } from "./services/admin-auth-guard.service";
+import { JwtHelperService, JWT_OPTIONS } from "@auth0/angular-jwt";
 
 // Sentry.io configuration
 Raven.config(
@@ -51,25 +50,47 @@ Raven.config(
     BrowserModule.withServerTransition({ appId: "ng-cli-universal" }),
     HttpClientModule,
     FormsModule,
+    ChartModule,
     ToastyModule.forRoot(),
     AuthModule.forRoot({
       domain: "dev-r8lrb84i.us.auth0.com",
       clientId: "O1ro1EP2yBHaMT6WRUobovqQdadknSuq",
     }),
     RouterModule.forRoot([
+      // Home route
       { path: "", component: HomeComponent, pathMatch: "full" },
-      // Added this route for VehicleFormComponent
       // Two different routes for vehicle page
       // Depending on whether the page is for a new vehicle, or to update an existing one.
-      { path: "vehicles/new", component: VehicleFormComponent },
+
+      // New vehicle form, need to be signed in to be able to post vehicle
+      {
+        path: "vehicles/new",
+        component: VehicleFormComponent,
+        canActivate: [MyAuthGuard],
+      },
       // Route to display vehicle information
       { path: "vehicles/:id", component: ViewVehicleComponent },
+
       // Route to edit vehicle information
-      { path: "vehicles/edit/:id", component: VehicleFormComponent },
+      // Need to be signed in
+      {
+        path: "vehicles/edit/:id",
+        component: VehicleFormComponent,
+        canActivate: [MyAuthGuard],
+      },
+
+      // Vehicle list component route
       { path: "vehicles", component: VehicleListComponent },
+
       // Checks if user is logged in before redirecting to admin page
       // If not logged in, redirect to login page
-      { path: "admin", component: AdminComponent, canActivate: [MyAuthGuard] },
+      // If logged in but not an admin, redirects back to home
+      // Uses AdminAuthGuard
+      {
+        path: "admin",
+        component: AdminComponent,
+        canActivate: [AdminAuthGuard],
+      },
       { path: "counter", component: CounterComponent },
       { path: "fetch-data", component: FetchDataComponent },
     ]),
@@ -77,18 +98,13 @@ Raven.config(
   providers: [
     // Configures the app to use AppErrorHandler instead of ErrorHandler class.
     { provide: ErrorHandler, useClass: AppErrorHandler },
-
-    // Override the http interceptors with custom class
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: BrowserXhrWithProgress,
-      multi: true,
-    },
     VehicleService,
+    AdminAuthGuard,
     PhotoService,
-    ProgressService,
     MyAuthGuard,
     MyAuthService,
+    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
+    JwtHelperService,
   ],
   bootstrap: [AppComponent],
 })

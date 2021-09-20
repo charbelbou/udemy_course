@@ -9,6 +9,22 @@ namespace udemy_course1.Extensions
 {
     public static class IQueryableExtensions
     {
+        // Applies filtering
+        // If MakeId has value, filters based off that Make
+        // If ModelId has value, filters based off that Model
+        // then returns query
+        public static IQueryable<Vehicle> ApplyFiltering(this IQueryable<Vehicle> query, VehicleQuery queryObject){
+            if(queryObject.MakeId.HasValue){
+                query = query.Where(v => v.Model.MakeId == queryObject.MakeId.Value);
+            }
+
+            //  If ModelId has value, update query to get vehicles with specific ModelID
+            if(queryObject.ModelId.HasValue){
+                query = query.Where(v => v.ModelId == queryObject.ModelId.Value);
+            }
+
+            return query;
+        }
         public static IQueryable<T> ApplyOrdering<T>(this IQueryable<T> query, IQueryObject queryObject ,Dictionary<string,Expression<Func<T,object>>> columnMaps){
             // If sortBy is null, or columnMaps doesnt contain the sortby, then just return the query
             if(String.IsNullOrEmpty(queryObject.SortBy) || !columnMaps.ContainsKey(queryObject.SortBy)){

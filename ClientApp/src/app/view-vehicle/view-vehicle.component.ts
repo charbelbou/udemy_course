@@ -1,3 +1,4 @@
+import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import {
   Component,
   ElementRef,
@@ -7,14 +8,26 @@ import {
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { ToastyService } from "ng2-toasty";
+import { MyAuthService } from "../services/auth.service";
 import { PhotoService } from "../services/photo.service";
-import { ProgressService } from "../services/progress.service";
+import {
+  BrowserXhrWithProgress,
+  ProgressService,
+} from "../services/progress.service";
 import { VehicleService } from "../services/vehicle.service";
 
 @Component({
   selector: "app-view-vehicle",
   templateUrl: "./view-vehicle.component.html",
   styleUrls: ["./view-vehicle.component.css"],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: BrowserXhrWithProgress,
+      multi: true,
+    },
+    ProgressService,
+  ],
 })
 export class ViewVehicleComponent implements OnInit {
   @ViewChild("fileInput") fileInput: ElementRef;
@@ -24,6 +37,7 @@ export class ViewVehicleComponent implements OnInit {
   progress: any;
 
   constructor(
+    private auth: MyAuthService,
     private route: ActivatedRoute,
     private router: Router,
     private toasty: ToastyService,

@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { of } from "rxjs";
 import { KeyValuePair, Vehicle } from "../models/vehicle";
+import { MyAuthService } from "../services/auth.service";
 import { VehicleService } from "../services/vehicle.service";
 
 @Component({
@@ -28,7 +29,10 @@ export class VehicleListComponent implements OnInit {
     {},
   ];
 
-  constructor(private VehicleService: VehicleService) {}
+  constructor(
+    private VehicleService: VehicleService,
+    public auth: MyAuthService
+  ) {}
 
   ngOnInit() {
     // Get Makes and subscribe

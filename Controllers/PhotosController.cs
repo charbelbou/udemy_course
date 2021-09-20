@@ -23,16 +23,16 @@ namespace udemy_course1.Controllers
     {
         private readonly IWebHostEnvironment host;
         private readonly IVehicleRepository repository;
-        private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly PhotoSettings photoSettings;
         private readonly IPhotoRepository photoRepository;
-        public PhotosController(IWebHostEnvironment host, IVehicleRepository repository, IUnitOfWork unitOfWork, IMapper mapper, IOptionsSnapshot<PhotoSettings> options, IPhotoRepository photoRepository)
+        private readonly IPhotoService photoService;
+        public PhotosController(IPhotoService photoService, IWebHostEnvironment host, IVehicleRepository repository, IMapper mapper, IOptionsSnapshot<PhotoSettings> options, IPhotoRepository photoRepository)
         {
+            this.photoService = photoService;
             this.photoRepository = photoRepository;
             this.photoSettings = options.Value;
             this.mapper = mapper;
-            this.unitOfWork = unitOfWork;
             this.host = host;
             this.repository = repository;
         }
@@ -86,28 +86,8 @@ namespace udemy_course1.Controllers
             // host.WebRootPath = "wwwroot"
             var uploadsFolderPath = Path.Combine(host.WebRootPath, "uploads");
 
-            // If directory doesn't exist, create foler
-            if (!Directory.Exists(uploadsFolderPath))
-            {
-                Directory.CreateDirectory(uploadsFolderPath);
-            }
-
-            // for security purposes, to prevent user from changing filename and accessing other files
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            // get full filePath with uploadsFolderPath
-            var filePath = Path.Combine(uploadsFolderPath, fileName);
-
-            // copying file into stream
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            // Creating Photo and adding it to vehicle.Photos
-            var photo = new Photo { FileName = fileName };
-            vehicle.Photos.Add(photo);
-            // Using unitOfWork to save changes
-            await unitOfWork.CompleteAsync();
+            // Upload photo using photoService, pass vehicle, file and folderpath
+            var photo = await photoService.UploadPhoto(vehicle, file, uploadsFolderPath);
 
             // Mapping Photo to PhotoResource, and returning it.
             return Ok(mapper.Map<Photo, PhotoResource>(photo));

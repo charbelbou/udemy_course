@@ -27,18 +27,9 @@ namespace udemy_course.Persistence
             var query = context.Vehicles
             .Include(v=>v.Model)
                 .ThenInclude(m=>m.Make)
-            .Include(v=>v.Features)
-                .ThenInclude(vf=>vf.Feature).AsQueryable();
-
-            //  If MakeId has value, update query to get vehicles with specific make
-            if(queryObject.MakeId.HasValue){
-                query = query.Where(v => v.Model.MakeId == queryObject.MakeId.Value);
-            }
-
-            //  If ModelId has value, update query to get vehicles with specific ModelID
-            if(queryObject.ModelId.HasValue){
-                query = query.Where(v => v.ModelId == queryObject.ModelId.Value);
-            }
+            .AsQueryable();
+            // Filtering
+            query = query.ApplyFiltering(queryObject);
 
             // Mapping specific strings to lamda functions.
             var columnMaps = new Dictionary<string,Expression<Func<Vehicle,object>>>(){
@@ -47,7 +38,6 @@ namespace udemy_course.Persistence
                 ["contactName"] = v=>v.ContactName,
                 ["id"] = v=>v.Id,
             };
-
             // Apply ordering (sorting) with queryobject and the map
             query = query.ApplyOrdering(queryObject,columnMaps);
 

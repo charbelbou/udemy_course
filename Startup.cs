@@ -11,6 +11,7 @@ using udemy_course1.Core.Models;
 using udemy_course1.Core;
 using udemy_course1.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using udemy_course1.Controllers;
 
 namespace udemy_course1
 {
@@ -40,12 +41,18 @@ namespace udemy_course1
             // Mapping interfaces to implementations
             services.AddScoped<IPhotoRepository,PhotoRepository>();
             services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddTransient<IPhotoService,PhotoService>();
+            services.AddTransient<IPhotoStorage,FileSystemPhotoStorage>();
             services.AddScoped<IVehicleRepository,VehicleRepository>();
 
             // Adding auto mapper through dependency injection
             services.AddAutoMapper(typeof(Startup));
             // Add the DbContext we've made as a service through dependency injection (DI)
-            services.AddDbContext<UdemyDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            services.AddDbContext<UdemyDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
+            // Add authorization, requiring "Admin" in "https://vega.com/roles" in the JWT.
+            services.AddAuthorization(options =>{
+                options.AddPolicy(Policies.RequireAdminRole,policy=>policy.RequireClaim("https://vega.com/roles","Admin"));
+            });
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
